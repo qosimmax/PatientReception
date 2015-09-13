@@ -1,0 +1,7 @@
+# Word Game
+__pycache__
+*.pyc
+### PyCharm ###
+# PyCharm
+.idea
+.iml
