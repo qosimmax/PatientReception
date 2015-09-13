@@ -42,7 +42,7 @@ def submit(request):
     form = NameForm(request.POST)
     # checks for valid
     if not form.is_valid():
-        return error_response(request, 'Ввдите данные')
+        return error_response(request, 'Введите данные')
 
     # find doctor by id
     try:
