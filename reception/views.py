@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 from django.shortcuts import render
-#from datetime import datetime, timedelta
+# from datetime import datetime, timedelta
 from django.utils import timezone
 
 from .models import *
@@ -9,7 +9,7 @@ from .forms import NameForm
 
 
 WORK_START_TIME = timezone.datetime.strptime("09:00", "%H:%M").time()  # 09:00
-WORK_END_TIME = timezone.datetime.strptime("18:00", "%H:%M").time()    # 18:00
+WORK_END_TIME = timezone.datetime.strptime("18:00", "%H:%M").time()  # 18:00
 
 
 def index(request):
@@ -68,8 +68,14 @@ def submit(request):
 
     # find a doctor and checks for free.
     try:
-        record = Record.objects.filter(doctor_id=doctor.pk).order_by('-accept_time')[:1].get()
-        is_free = record.accept_time.date() == accept_day and accept_time > record.finish_time.time()
+        record = Record.objects.filter(doctor_id=doctor.pk).filter(
+            accept_time__year=timezone.now().year,
+            accept_time__month=timezone.now().month,
+            accept_time__day=timezone.now().day,
+        ).order_by('-accept_time')[:1].get()
+
+        is_free = accept_time > record.finish_time.time()
+
     except Record.DoesNotExist:
         is_free = True
 
