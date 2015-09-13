@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-
+# Model of Patient
 class Patient(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -11,7 +11,7 @@ class Patient(models.Model):
     def __str__(self):
         return '%s %s %s' % (self.last_name, self.first_name, self.patronymic)
 
-
+# Model of Doctor
 class Doctor(models.Model):
     name = models.CharField(max_length=100)
     reg_date = models.DateTimeField(auto_now=True)
@@ -23,7 +23,7 @@ class Doctor(models.Model):
     def get_all():
         return Doctor.objects.all().order_by('name')
 
-
+# Model of reception record
 class Record(models.Model):
     patient = models.ForeignKey(Patient)
     doctor = models.ForeignKey(Doctor)
