@@ -1,3 +1,3 @@
-# PatientReception
+# Patient-Reception
 Patients reception registration
 
