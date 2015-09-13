@@ -56,26 +56,25 @@ def submit(request):
     accept_datetime = timezone.datetime.combine(accept_day, accept_time)
 
     # checking for weekend and work time
-    # if is_weekend(accept_day) or not is_work_time(accept_time):
-    # return error_response(request, 'нерабочая время!')
+    if is_weekend(accept_day) or not is_work_time(accept_time):
+        return error_response(request, 'нерабочая время!')
 
-    # checking for current date and time
-    # if timezone.now().date() != accept_day or accept_time < timezone.now().time():
-    # return error_response(request, 'укажите правильную дату и время')
+        # checking for current date and time
+    if timezone.now().date() != accept_day or accept_time < timezone.now().time():
+        return error_response(request, 'укажите правильную дату и время')
 
     # checking for enough time
-    # if (accept_datetime + timezone.timedelta(hours=1)).time() > WORK_END_TIME:
-    #     return error_response(request, 'Время не хватит для приема!')
+    if (accept_datetime + timezone.timedelta(hours=1)).time() > WORK_END_TIME:
+        return error_response(request, 'Время не хватит для приема!')
 
     # find a doctor and checks for free.
     try:
         records = Record.objects.filter(doctor_id=doctor.pk).filter(
-            Q(accept_time__lt=accept_datetime) &
+            Q(accept_time__lte=accept_datetime) &
             Q(finish_time__gt=accept_datetime) |
             Q(accept_time__lt=accept_datetime + timezone.timedelta(hours=1)) &
             Q(finish_time__gt=accept_datetime + timezone.timedelta(hours=1)))
 
-        print('len', len(records))
         is_free = len(records) < 1
 
     except Record.DoesNotExist:
