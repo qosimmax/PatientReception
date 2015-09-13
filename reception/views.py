@@ -3,6 +3,7 @@ from django.template import RequestContext, loader
 from django.shortcuts import render
 # from datetime import datetime, timedelta
 from django.utils import timezone
+from django.db.models import Q
 
 from .models import *
 from .forms import NameForm
@@ -55,32 +56,33 @@ def submit(request):
     accept_datetime = timezone.datetime.combine(accept_day, accept_time)
 
     # checking for weekend and work time
-    if is_weekend(accept_day) or not is_work_time(accept_time):
-        return error_response(request, 'нерабочая время!')
+    # if is_weekend(accept_day) or not is_work_time(accept_time):
+    # return error_response(request, 'нерабочая время!')
 
     # checking for current date and time
-    if timezone.now().date() != accept_day or accept_time < timezone.now().time():
-        return error_response(request, 'укажите правильную дату и время')
+    # if timezone.now().date() != accept_day or accept_time < timezone.now().time():
+    # return error_response(request, 'укажите правильную дату и время')
 
     # checking for enough time
-    if (accept_datetime + timezone.timedelta(hours=1)).time() > WORK_END_TIME:
-        return error_response(request, 'Время не хватит для приема!')
+    # if (accept_datetime + timezone.timedelta(hours=1)).time() > WORK_END_TIME:
+    #     return error_response(request, 'Время не хватит для приема!')
 
     # find a doctor and checks for free.
     try:
-        record = Record.objects.filter(doctor_id=doctor.pk).filter(
-            accept_time__year=timezone.now().year,
-            accept_time__month=timezone.now().month,
-            accept_time__day=timezone.now().day,
-        ).order_by('-accept_time')[:1].get()
+        records = Record.objects.filter(doctor_id=doctor.pk).filter(
+            Q(accept_time__lt=accept_datetime) &
+            Q(finish_time__gt=accept_datetime) |
+            Q(accept_time__lt=accept_datetime + timezone.timedelta(hours=1)) &
+            Q(finish_time__gt=accept_datetime + timezone.timedelta(hours=1)))
 
-        is_free = accept_time > record.finish_time.time()
+        print('len', len(records))
+        is_free = len(records) < 1
 
     except Record.DoesNotExist:
         is_free = True
 
     if not is_free:
-        return error_response(request, 'Врач занят.')
+        return error_response(request, 'В это время врач занято')
 
     # register patient
     patient = Patient(first_name=form.cleaned_data['firstname'],
