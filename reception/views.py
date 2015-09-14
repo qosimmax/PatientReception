@@ -61,7 +61,7 @@ def submit(request):
 
         # checking for current date and time
     if timezone.now().date() != accept_day or accept_time < timezone.now().time():
-        return error_response(request, 'укажите правильную дату и время')
+        return error_response(request, 'Прием только к будущим временам')
 
     # checking for enough time
     if (accept_datetime + timezone.timedelta(hours=1)).time() > WORK_END_TIME:
