@@ -11,3 +11,8 @@ http://127.0.0.1:8000/admin
 
 - user: admin
 - password: admin
+
+requirements:
+
+ - python 3.x
+ - django >= 1.8
