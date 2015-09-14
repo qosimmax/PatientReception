@@ -57,9 +57,9 @@ def submit(request):
 
     # checking for weekend and work time
     if is_weekend(accept_day) or not is_work_time(accept_time):
-        return error_response(request, 'нерабочая время!')
+        return error_response(request, 'Нерабочая время!')
 
-        # checking for current date and time
+    # checking for current date and time
     if timezone.now().date() != accept_day or accept_time < timezone.now().time():
         return error_response(request, 'Прием только к будущим временам')
 
